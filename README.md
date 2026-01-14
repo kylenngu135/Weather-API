@@ -1,1 +1,1 @@
-stuff
+Basic Weather API Project
