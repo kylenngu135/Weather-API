@@ -1,0 +1,81 @@
+Core Features:
+    - hosts on localhost:8080
+    - implement rate limiting
+
+    API Endpoints
+        - GET current weather by city name
+        - GET weather forecast (3-5 days)
+        - GET weather by coordinates (latitude/longitude)
+        - Optional: GET weather for multiple cities in one request
+
+    Caching Strategy
+        - Cache weather data in Redis with appropriate TTL (time-to-live) - weather data doesn't change constantly, so 10-30 minutes is reasonable
+        - Implement cache-first logic: check Redis before hitting the external API
+        - Cache key structure (e.g., weather:{city}:{type} or weather:{lat}:{lon})
+        - Track cache hit/miss rates for monitoring
+
+    Error Handling
+        - Handle invalid city names or coordinates
+        - Manage external API rate limits gracefully
+        - Handle Redis connection failures (fallback to direct API calls)
+        - Return meaningful error messages with proper HTTP status codes
+        - Implement retry logic for failed third-party API calls
+
+    Rate Limiting
+        - Implement rate limiting on your API endpoints (to simulate real-world scenarios)
+        - Track API usage per client/IP
+
+    Data Transformation
+        - Parse and normalize data from the third-party API
+        - Return only relevant fields to your frontend (temperature, conditions, humidity, wind speed, etc.)
+        - Convert units if needed (Celsius/Fahrenheit)
+
+    Monitoring & Logging
+        - Log cache hits vs misses
+        - Log external API calls and response times
+        - Track error rates
+        - Optional: Simple health check endpoint
+
+    Configuration
+        - Environment variables for API keys, Redis connection, port
+        - Configurable cache TTL
+        - Configurable rate limits
+
+Essential UI Features
+    Search Functionality
+        - Input field to search by city name
+        - Optional: Search by coordinates or current location (using browser's geolocation API)
+        - Search button or search-on-enter functionality
+        - Handle loading states while fetching data
+
+    Current Weather Display
+        - City name and country
+        - Current temperature (with unit toggle for °C/°F)
+        - Weather condition (sunny, cloudy, rainy, etc.)
+        - Weather icon/illustration matching the condition
+        - Additional details: humidity, wind speed, "feels like" temperature, visibility
+        - Timestamp of last update
+
+    Forecast Display
+        - 3-5 day forecast cards
+        - Each day showing: date, high/low temps, condition icon, precipitation chance
+
+    Error Handling UI
+        - Display user-friendly error messages (e.g., "City not found", "API error")
+        - Show when the app is offline or can't connect to backend
+        - Clear error states with option to retry
+
+    Loading States
+        - Skeleton screens or loading spinners while fetching data
+        - Indicate when data is being loaded from cache vs fresh API call (optional but educational)
+
+    Responsive Design
+        - Mobile-friendly layout
+        - Works well on desktop, tablet, and mobile
+
+    Nice-to-Have Features
+        - Recent searches list (stored in localStorage)
+        - Favorite cities (save multiple locations)
+        - Background or theme changes based on weather conditions
+        - Auto-refresh option
+        - Display cache status (shows if data came from cache - good for demonstrating your backend caching)
