@@ -20,8 +20,7 @@ type Day struct {
 }
 
 func getWeather() {
-	apiKey := "U3PMA4XKVLCHQNGKTHX9L5DLL"
-	apiKey:= os.Getenv("VISUAL_CROSSING_API_KEY")
+	apiKey := os.Getenv("VISUAL_CROSSING_API_KEY")
 	location := "Seattle,WA"
 
 	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
