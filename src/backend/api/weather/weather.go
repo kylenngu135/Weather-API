@@ -23,22 +23,28 @@ type Day struct {
 	Humidity float64 `json:"humidity"`
 }
 
-func GetWeather() (weather WeatherResponse) {
-	err := godotenv.Load()
+func GetWeather() (weather WeatherResponse, err error) {
+	// load environment variables
+	err = godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
 		return
 	}
 
+	// get API key from environment variables
 	apiKey := os.Getenv("VISUAL_CROSSING_API_KEY")
+	if apiKey == "" {
+		fmt.Println("invalid API key")
+		return
+	}
 
+	// create url
 	location := "Seattle,WA"
-
 	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
 	fullURL := fmt.Sprintf("%s/%s?key=%s&unitGroup=us", baseURL, url.QueryEscape(location), apiKey)
 
+	// make a request for weather data from visual crossing
 	resp, err := http.Get(fullURL)
-
 	if err != nil {
 		fmt.Printf("Error making request: %v\n", err)
 		return
@@ -48,15 +54,18 @@ func GetWeather() (weather WeatherResponse) {
 	// Check status code
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("API returned status: %d\n", resp.StatusCode)
+		err = fmt.Errorf("Bad status code: %v", resp.StatusCode)
 		return
 	}
 
+	// read body contents
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("Error reading response: %v\n", err)
 		return
 	}
 
+	// extract desired data from body, store in weather
 	err = json.Unmarshal(body, &weather)
 	if err != nil {
 		fmt.Printf("Error parsing JSON: %v\n", err)
@@ -67,7 +76,7 @@ func GetWeather() (weather WeatherResponse) {
 }
 
 func PrintWeather(weather WeatherResponse) {
-	// Use the data
+	// prints weather data
 	fmt.Printf("Weather for: %s\n", weather.ResolvedAddress)
 	if len(weather.Days) > 0 {
 		today := weather.Days[0]
@@ -77,20 +86,34 @@ func PrintWeather(weather WeatherResponse) {
 	}
 }
 
-/*
-func handleWeather(w http.ResponseWrtier, r *http.Request) {
+func HandleWeather(w http.ResponseWriter, r *http.Request) {
+	// set header response to json
     w.Header().Set("Content-Type", "application/json")
 
+	// initial check to establish connection
 	if r.Method == "OPTIONS" {
+		fmt.Println("Failed to establish connection")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
+	// verify the method is a GET
 	if r.Method != "GET" {
+		fmt.Println("Method isn't a GET method")
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// get weather data from visual crossing
+	resp, err := GetWeather()
+	if err != nil {
+		http.Error(w, "failed to retrieve data", http.StatusMethodNotAllowed)
+
+		return
+	}
+
+	// write the response 
+	json.NewEncoder(w).Encode(resp)
+
 	return
 }
-*/
