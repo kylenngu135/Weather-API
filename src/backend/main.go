@@ -19,7 +19,7 @@ func main() {
 	http.Handle("/frontend/", http.StripPrefix("/frontend/", fs_frontend))
 
 	// handle endpoints
-	http.HandleFunc("/api/weather", weather.HandleWeather)
+	http.HandleFunc("/api/weather/", weather.HandleWeather)
 
 	// enable cors
 	fmt.Println("Server running on http://localhost:8080")

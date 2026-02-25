@@ -23,7 +23,27 @@ type Day struct {
 	Humidity float64 `json:"humidity"`
 }
 
-func GetWeather() (weather WeatherResponse, err error) {
+func buildWeatherURL(location string, startDate string, endDate string, apiKey string) (path string) {
+	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
+
+	// base + location
+	path = fmt.Sprintf("%s/%s", baseURL, url.QueryEscape(location))
+
+	// add dates if provided
+	if startDate != "" {
+		path += "/" + startDate
+		if endDate != "" {
+			path += "/" + endDate
+		}
+	}
+
+	path += "?key=" + apiKey
+
+	return path
+}
+
+// gets weather information from visualcrossing weather API based in Seattle, Washington
+func GetWeather(location string, startDate string, endDate string) (weather WeatherResponse, err error) {
 	// load environment variables
 	err = godotenv.Load()
 	if err != nil {
@@ -39,9 +59,7 @@ func GetWeather() (weather WeatherResponse, err error) {
 	}
 
 	// create url
-	location := "Seattle,WA"
-	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
-	fullURL := fmt.Sprintf("%s/%s?key=%s&unitGroup=us", baseURL, url.QueryEscape(location), apiKey)
+	fullURL := buildWeatherURL(location, startDate, endDate, apiKey)
 
 	// make a request for weather data from visual crossing
 	resp, err := http.Get(fullURL)
@@ -75,6 +93,7 @@ func GetWeather() (weather WeatherResponse, err error) {
 	return
 }
 
+// Prints todays weather
 func PrintWeather(weather WeatherResponse) {
 	// prints weather data
 	fmt.Printf("Weather for: %s\n", weather.ResolvedAddress)
@@ -86,6 +105,7 @@ func PrintWeather(weather WeatherResponse) {
 	}
 }
 
+// handles api request to get weather
 func HandleWeather(w http.ResponseWriter, r *http.Request) {
 	// set header response to json
     w.Header().Set("Content-Type", "application/json")
@@ -104,8 +124,23 @@ func HandleWeather(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	location := r.URL.Query().Get("location")
+	startDate := r.URL.Query().Get("startDate")
+	endDate := r.URL.Query().Get("endDate")
+
+	if location == "" {
+		http.Error(w, "location is required", http.StatusBadRequest)
+		return
+	}
+
+	if endDate != "" && startDate == "" {
+		http.Error(w, "start date is required if end date exists", http.StatusBadRequest)
+		return
+	}
+
 	// get weather data from visual crossing
-	resp, err := GetWeather()
+	resp, err := GetWeather(location, startDate, endDate)
+
 	if err != nil {
 		http.Error(w, "failed to retrieve data", http.StatusMethodNotAllowed)
 
