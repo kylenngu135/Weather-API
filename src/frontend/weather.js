@@ -13,9 +13,42 @@ const weatherCardTemplate = (day, formattedDate) => `
             <span class="info-label">Humidity</span>
             <span class="info-value">${Math.round(day.humidity)}%</span>
         </div>
-        ${day.conditions ? `<div class="conditions">${day.conditions}</div>` : ''}
+        <div class="info-row">
+            <span class="info-label">Precipitation</span>
+            <span class="info-value">${day.precip || 0}"</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Wind Speed</span>
+            <span class="info-value">${Math.round(day.windspeed)} mph</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Cloud Cover</span>
+            <span class="info-value">${Math.round(day.cloudcover)}%</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Sunrise</span>
+            <span class="info-value">${formatTime(day.sunrise)}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Sunset</span>
+            <span class="info-value">${formatTime(day.sunset)}</span>
+        </div>
+        ${day.conditions ? `<div class="conditions">${day.icon ? '🌤️ ' : ''}${day.conditions}</div>` : ''}
     </div>
 `;
+
+// Helper function to format time (add this to your JS file)
+function formatTime(timeString) {
+    if (!timeString) return 'N/A';
+    
+    // timeString comes as "HH:MM:SS" from Visual Crossing
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    
+    return `${displayHour}:${minutes} ${ampm}`;
+}
 
 const form = document.getElementById('weatherForm');
 const errorMessage = document.getElementById('errorMessage');
