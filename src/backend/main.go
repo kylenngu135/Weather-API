@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	// custom modules
 	"weather/api/weather"
@@ -18,8 +19,11 @@ func main() {
 	http.Handle("/", fs_ui)
 	http.Handle("/frontend/", http.StripPrefix("/frontend/", fs_frontend))
 
+	// 10 requests per minute
+	limiter := middleware.NewRateLimiter(10, time.Minute)
+
 	// handle endpoints
-	http.HandleFunc("/api/weather/", weather.HandleWeather)
+	http.HandleFunc("/api/weather/", limiter.Middleware(weather.HandleWeather))
 
 	// enable cors
 	fmt.Println("Server running on http://localhost:8080")
