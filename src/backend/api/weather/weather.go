@@ -16,11 +16,29 @@ type WeatherResponse struct {
 }
 
 type Day struct {
-	Datetime string  `json:"datetime"`
-	TempMax  float64 `json:"tempmax"`
-	TempMin  float64 `json:"tempmin"`
-	Temp     float64 `json:"temp"`
-	Humidity float64 `json:"humidity"`
+	Hours 	  	[]Hour  `json:"hours"`
+	Datetime  	string  `json:"datetime"`
+	Sunrise	  	string  `json:"sunrise"`
+	Sunset	  	string  `json:"sunset"`
+	Conditions	string  `json:"conditions"`
+	Icon		string 	`json:"icon"`
+	TempMax   	float64 `json:"tempmax"`
+	TempMin   	float64 `json:"tempmin"`
+	Temp      	float64 `json:"temp"`
+	Humidity  	float64 `json:"humidity"`
+	Precip	  	float64 `json:"precip"`
+	Windspeed 	float64 `json:"windspeed"`
+	Cloudcover	float64 `json:"cloudcover"`
+}	
+
+type Hour struct {
+	Datetime  	string  `json:"datetime"`
+	Conditions	string  `json:"conditions"`
+	Icon		string 	`json:"icon"`
+	Temp      	float64 `json:"temp"`
+	Windspeed 	float64 `json:"windspeed"`
+	Humidity  	float64 `json:"humidity"`
+	Cloudcover	float64 `json:"cloudcover"`
 }
 
 func buildWeatherURL(location string, startDate string, endDate string, apiKey string) (path string) {
@@ -63,6 +81,7 @@ func GetWeather(location string, startDate string, endDate string) (weather Weat
 
 	// make a request for weather data from visual crossing
 	resp, err := http.Get(fullURL)
+
 	if err != nil {
 		fmt.Printf("Error making request: %v\n", err)
 		return
