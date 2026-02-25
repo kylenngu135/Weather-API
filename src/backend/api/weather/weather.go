@@ -10,37 +10,41 @@ import (
 	"os"
 )
 
+// Stores all weather data received from visualcrossing response 
 type WeatherResponse struct {
 	ResolvedAddress string `json:"resolvedAddress"`
 	Days            []Day  `json:"days"`
 }
 
+// Stores the information for a single day's weather
 type Day struct {
-	Hours 	  	[]Hour  `json:"hours"`
-	Datetime  	string  `json:"datetime"`
-	Sunrise	  	string  `json:"sunrise"`
-	Sunset	  	string  `json:"sunset"`
-	Conditions	string  `json:"conditions"`
-	Icon		string 	`json:"icon"`
-	TempMax   	float64 `json:"tempmax"`
-	TempMin   	float64 `json:"tempmin"`
-	Temp      	float64 `json:"temp"`
-	Humidity  	float64 `json:"humidity"`
-	Precip	  	float64 `json:"precip"`
-	Windspeed 	float64 `json:"windspeed"`
-	Cloudcover	float64 `json:"cloudcover"`
-}	
-
-type Hour struct {
-	Datetime  	string  `json:"datetime"`
-	Conditions	string  `json:"conditions"`
-	Icon		string 	`json:"icon"`
-	Temp      	float64 `json:"temp"`
-	Windspeed 	float64 `json:"windspeed"`
-	Humidity  	float64 `json:"humidity"`
-	Cloudcover	float64 `json:"cloudcover"`
+	Hours      []Hour  `json:"hours"`
+	Datetime   string  `json:"datetime"`
+	Sunrise    string  `json:"sunrise"`
+	Sunset     string  `json:"sunset"`
+	Conditions string  `json:"conditions"`
+	Icon       string  `json:"icon"`
+	TempMax    float64 `json:"tempmax"`
+	TempMin    float64 `json:"tempmin"`
+	Temp       float64 `json:"temp"`
+	Humidity   float64 `json:"humidity"`
+	Precip     float64 `json:"precip"`
+	Windspeed  float64 `json:"windspeed"`
+	Cloudcover float64 `json:"cloudcover"`
 }
 
+// Stores the information for a single hour's weather
+type Hour struct {
+	Datetime   string  `json:"datetime"`
+	Conditions string  `json:"conditions"`
+	Icon       string  `json:"icon"`
+	Temp       float64 `json:"temp"`
+	Windspeed  float64 `json:"windspeed"`
+	Humidity   float64 `json:"humidity"`
+	Cloudcover float64 `json:"cloudcover"`
+}
+
+// builds the weather url to make a request to
 func buildWeatherURL(location string, startDate string, endDate string, apiKey string) (path string) {
 	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
 
@@ -55,6 +59,7 @@ func buildWeatherURL(location string, startDate string, endDate string, apiKey s
 		}
 	}
 
+	// adds API key
 	path += "?key=" + apiKey
 
 	return path
@@ -127,7 +132,7 @@ func PrintWeather(weather WeatherResponse) {
 // handles api request to get weather
 func HandleWeather(w http.ResponseWriter, r *http.Request) {
 	// set header response to json
-    w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	// initial check to establish connection
 	if r.Method == "OPTIONS" {
@@ -166,7 +171,7 @@ func HandleWeather(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// write the response 
+	// write the response
 	json.NewEncoder(w).Encode(resp)
 
 	return
